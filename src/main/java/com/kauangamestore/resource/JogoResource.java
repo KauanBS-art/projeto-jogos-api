@@ -1,14 +1,14 @@
+//Classe de Kauan Batista Silveira
+
 package com.kauangamestore.resource;
 
-import com.kauangamestore.model.Jogo;
-import com.kauangamestore.repository.JogoRepository;
+import com.kauangamestore.dto.JogoDTO;
+import com.kauangamestore.dto.JogoDTOResponse;
+import com.kauangamestore.service.JogoService;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
-import java.net.URI;
+import jakarta.ws.rs.core.*;
 import java.util.List;
 
 @Path("/jogos")
@@ -17,45 +17,46 @@ import java.util.List;
 public class JogoResource {
 
     @Inject
-    JogoRepository jogoRepository;
+    JogoService jogoService;
 
     @GET
-    public List<Jogo> listAll() {
-        return jogoRepository.listAll();
+    public List<JogoDTOResponse> listarTodos() {
+        return jogoService.findAll();
     }
 
     @GET
     @Path("/{id}")
-    public Jogo getById(@PathParam("id") Long id) {
-        return jogoRepository.findById(id);
+    public Response buscarPorId(@PathParam("id") Long id) {
+        JogoDTOResponse jogo = jogoService.findById(id);
+        if (jogo == null)
+            return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.ok(jogo).build();
     }
 
+
     @POST
-    @Transactional
-    public Response create(Jogo jogo) {
-        jogoRepository.persist(jogo);
-        return Response.created(URI.create("/jogos/" + jogo.getId())).entity(jogo).build();
+    public Response criar(@Valid JogoDTO dto, @Context UriInfo uriInfo) {
+        JogoDTOResponse created = jogoService.create(dto);
+        UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.id()));
+        return Response.created(builder.build()).entity(created).build();
     }
 
     @PUT
     @Path("/{id}")
-    @Transactional
-    public Response update(@PathParam("id") Long id, Jogo updated) {
-        Jogo j = jogoRepository.findById(id);
-        if (j == null) return Response.status(Response.Status.NOT_FOUND).build();
-        j.setTitulo(updated.getTitulo());
-        j.setDescricao(updated.getDescricao());
-        j.setPreco(updated.getPreco());
-        j.setDataLancamento(updated.getDataLancamento());
-        return Response.ok(j).build();
+    public Response atualizar(@PathParam("id") Long id, @Valid JogoDTO dto) {
+        JogoDTOResponse jogo = jogoService.update(id, dto);
+        return jogo == null
+            ? Response.status(Response.Status.NOT_FOUND).build()
+            : Response.ok(jogo).build();
     }
 
+    // DELETAR
     @DELETE
     @Path("/{id}")
-    @Transactional
-    public Response delete(@PathParam("id") Long id) {
-        boolean deleted = jogoRepository.deleteById(id);
-        if (deleted) return Response.noContent().build();
+    public Response deletar(@PathParam("id") Long id) {
+        boolean deleted = jogoService.deletar(id);
+        if (deleted)
+            return Response.noContent().build();
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 }
