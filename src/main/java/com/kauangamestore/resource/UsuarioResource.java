@@ -1,14 +1,14 @@
+//Classe de Kauan Batista Silveira
+
 package com.kauangamestore.resource;
 
-import com.kauangamestore.model.Usuario;
-import com.kauangamestore.repository.UsuarioRepository;
+import com.kauangamestore.dto.UsuarioDTO;
+import com.kauangamestore.dto.UsuarioDTOResponse;
+import com.kauangamestore.service.UsuarioService;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
-import java.net.URI;
+import jakarta.ws.rs.core.*;
 import java.util.List;
 
 @Path("/usuarios")
@@ -17,62 +17,49 @@ import java.util.List;
 public class UsuarioResource {
 
     @Inject
-    UsuarioRepository usuarioRepository;
+    UsuarioService usuarioService;
 
+    // LISTAR TODOS
     @GET
-    public List<Usuario> listAll() {
-        return usuarioRepository.listAll();
+    public List<UsuarioDTOResponse> listarTodos() {
+        return usuarioService.findAll();
     }
 
+    // BUSCAR POR ID
     @GET
     @Path("/{id}")
-    public Usuario getById(@PathParam("id") Long id) {
-        return usuarioRepository.findById(id);
+    public Response buscarPorId(@PathParam("id") Long id) {
+        UsuarioDTOResponse usuario = usuarioService.findById(id);
+        if (usuario == null)
+            return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.ok(usuario).build();
     }
 
+    // CRIAR NOVO
     @POST
-    @Transactional
-    public Response create(Usuario user) {
-        Usuario existing = usuarioRepository.find("email", user.getEmail()).firstResult();
-        if (existing != null) {
-            return Response.status(Response.Status.CONFLICT)
-                           .entity("Email já cadastrado").build();
-        }
-        usuarioRepository.persist(user);
-        return Response.created(URI.create("/usuarios/" + user.getId())).entity(user).build();
+    public Response criar(@Valid UsuarioDTO dto, @Context UriInfo uriInfo) {
+        UsuarioDTOResponse created = usuarioService.create(dto);
+        UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.id()));
+        return Response.created(builder.build()).entity(created).build();
     }
 
+    // ATUALIZAR EXISTENTE
     @PUT
     @Path("/{id}")
-    @Transactional
-    public Response update(@PathParam("id") Long id, Usuario updated) {
-        Usuario entity = usuarioRepository.findById(id);
-        if (entity == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        entity.setNome(updated.getNome());
-        entity.setEmail(updated.getEmail());
-        entity.setSenha(updated.getSenha());
-        entity.setTipo(updated.getTipo());
-        return Response.ok(entity).build();
+    public Response atualizar(@PathParam("id") Long id, @Valid UsuarioDTO dto) {
+        UsuarioDTOResponse usuario = usuarioService.update(id, dto);
+        return usuario == null
+            ? Response.status(Response.Status.NOT_FOUND).build()
+            : Response.ok(usuario).build();
     }
 
+    // DELETAR
     @DELETE
     @Path("/{id}")
-    @Transactional
-    public Response delete(@PathParam("id") Long id) {
-        boolean deleted = usuarioRepository.deleteById(id);
-        if (deleted) return Response.noContent().build();
+    public Response deletar(@PathParam("id") Long id) {
+        boolean deleted = usuarioService.deletar(id);
+        if (deleted)
+            return Response.noContent().build();
         return Response.status(Response.Status.NOT_FOUND).build();
-    }
-
-    @POST
-    @Path("/login")
-    public Response login(Usuario credentials) {
-        Usuario user = usuarioRepository.find("email", credentials.getEmail()).firstResult();
-        if (user != null && user.getSenha().equals(credentials.getSenha())) {
-            return Response.ok(user).build();
-        }
-        return Response.status(Response.Status.UNAUTHORIZED).entity("Credenciais inválidas").build();
     }
 }
