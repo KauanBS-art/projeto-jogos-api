@@ -27,9 +27,10 @@ public class Jogo {
     private LocalDate dataLancamento;
 
 
-    @ManyToOne(optional = true)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "id_empresa")
     private Empresa empresa;
+
 
     @ManyToMany
     @JoinTable(
