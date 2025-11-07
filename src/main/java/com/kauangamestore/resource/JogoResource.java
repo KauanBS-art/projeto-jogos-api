@@ -6,6 +6,7 @@ import com.kauangamestore.dto.JogoDTO;
 import com.kauangamestore.dto.JogoDTOResponse;
 import com.kauangamestore.service.JogoService;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
@@ -20,8 +21,9 @@ public class JogoResource {
     JogoService jogoService;
 
     @GET
-    public List<JogoDTOResponse> listarTodos() {
-        return jogoService.findAll();
+    public Response listarTodos() {
+        List<JogoDTOResponse> jogos = jogoService.findAll();
+        return Response.ok(jogos).build();
     }
 
     @GET
@@ -33,16 +35,23 @@ public class JogoResource {
         return Response.ok(jogo).build();
     }
 
-
     @POST
+    @Transactional
     public Response criar(@Valid JogoDTO dto, @Context UriInfo uriInfo) {
         JogoDTOResponse created = jogoService.create(dto);
+        if (created == null || created.id() == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Erro ao criar jogo. Verifique se o ID da empresa existe.")
+                    .build();
+        }
         UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.id()));
         return Response.created(builder.build()).entity(created).build();
     }
 
+
     @PUT
     @Path("/{id}")
+    @Transactional
     public Response atualizar(@PathParam("id") Long id, @Valid JogoDTO dto) {
         JogoDTOResponse jogo = jogoService.update(id, dto);
         return jogo == null
@@ -50,13 +59,13 @@ public class JogoResource {
             : Response.ok(jogo).build();
     }
 
-    // DELETAR
     @DELETE
     @Path("/{id}")
+    @Transactional
     public Response deletar(@PathParam("id") Long id) {
         boolean deleted = jogoService.deletar(id);
-        if (deleted)
-            return Response.noContent().build();
-        return Response.status(Response.Status.NOT_FOUND).build();
+        return deleted
+            ? Response.noContent().build()
+            : Response.status(Response.Status.NOT_FOUND).build();
     }
 }
