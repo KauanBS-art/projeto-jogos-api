@@ -24,7 +24,6 @@ public class EmpresaDTOResponse {
     public String getDescricao() { return descricao; }
     public int getTotalJogos() { return totalJogos; }
 
-    // Setters
     public void setId(Long id) { this.id = id; }
     public void setNome(String nome) { this.nome = nome; }
     public void setPaisOrigem(String paisOrigem) { this.paisOrigem = paisOrigem; }
