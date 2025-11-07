@@ -21,11 +21,14 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Override
     @Transactional
     public EmpresaDTOResponse create(EmpresaDTO dto) {
+        if (dto == null) return null;
+
         Empresa empresa = new Empresa();
-        empresa.setNome(dto.nome());            // ✅ corrigido
-        empresa.setPaisOrigem(dto.paisOrigem()); // ✅ corrigido
-        empresa.setDescricao(dto.descricao());   // ✅ corrigido
+        empresa.setNome(dto.nome());
+        empresa.setPaisOrigem(dto.paisOrigem());
+        empresa.setDescricao(dto.descricao() != null ? dto.descricao() : "");
         repository.persist(empresa);
+
         return new EmpresaDTOResponse(
             empresa.getId(),
             empresa.getNome(),
@@ -70,10 +73,10 @@ public class EmpresaServiceImpl implements EmpresaService {
         if (empresa == null) {
             return null;
         }
-        empresa.setNome(dto.nome());            // ✅ corrigido
-        empresa.setPaisOrigem(dto.paisOrigem()); // ✅ corrigido
-        empresa.setDescricao(dto.descricao());   // ✅ corrigido
-        repository.persist(empresa);
+        empresa.setNome(dto.nome());
+        empresa.setPaisOrigem(dto.paisOrigem());
+        empresa.setDescricao(dto.descricao() != null ? dto.descricao() : "");
+        
         return new EmpresaDTOResponse(
             empresa.getId(),
             empresa.getNome(),
