@@ -1,3 +1,5 @@
+//Classe do aluno Kauan Batista Silveira
+
 package com.kauangamestore.model;
 
 import jakarta.persistence.DiscriminatorValue;
