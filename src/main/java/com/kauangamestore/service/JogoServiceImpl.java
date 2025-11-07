@@ -1,3 +1,5 @@
+//Classe de Kauan Batista Silveira
+
 package com.kauangamestore.service;
 
 import com.kauangamestore.dto.JogoDTO;
@@ -35,9 +37,14 @@ public class JogoServiceImpl implements JogoService {
     @Override
     @Transactional
     public JogoDTOResponse create(JogoDTO dto) {
+        if (dto == null || dto.idEmpresa() == null)
+            return null;
+
         Empresa empresa = empresaRepository.findById(dto.idEmpresa());
-        if (empresa == null)
-            throw new IllegalArgumentException("Empresa com ID " + dto.idEmpresa() + " não encontrada.");
+        if (empresa == null) {
+            // Não lança exceção, apenas retorna nulo para o Resource retornar 400
+            return null;
+        }
 
         Jogo jogo = new Jogo();
         jogo.setTitulo(dto.titulo());
@@ -68,12 +75,10 @@ public class JogoServiceImpl implements JogoService {
     @Transactional
     public JogoDTOResponse update(Long id, JogoDTO dto) {
         Jogo jogo = jogoRepository.findById(id);
-        if (jogo == null)
-            return null;
+        if (jogo == null) return null;
 
         Empresa empresa = empresaRepository.findById(dto.idEmpresa());
-        if (empresa == null)
-            throw new IllegalArgumentException("Empresa com ID " + dto.idEmpresa() + " não encontrada.");
+        if (empresa == null) return null;
 
         jogo.setTitulo(dto.titulo());
         jogo.setDescricao(dto.descricao());
