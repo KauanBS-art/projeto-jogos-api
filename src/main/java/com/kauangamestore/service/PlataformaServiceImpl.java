@@ -27,7 +27,7 @@ public class PlataformaServiceImpl implements PlataformaService {
     @Transactional
     public PlataformaDTOResponse create(PlataformaDTO dto) {
         Plataforma plataforma = new Plataforma();
-        plataforma.setNome(dto.nome()); // ✅ corrigido
+        plataforma.setNome(dto.nome());
         repository.persist(plataforma);
         return toResponse(plataforma);
     }
@@ -50,7 +50,7 @@ public class PlataformaServiceImpl implements PlataformaService {
     public PlataformaDTOResponse update(Long id, PlataformaDTO dto) {
         Plataforma plataforma = repository.findById(id);
         if (plataforma == null) return null;
-        plataforma.setNome(dto.nome()); // ✅ corrigido
+        plataforma.setNome(dto.nome());
         repository.persist(plataforma);
         return toResponse(plataforma);
     }
