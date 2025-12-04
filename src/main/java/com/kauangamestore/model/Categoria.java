@@ -1,3 +1,5 @@
+//Classe de Kauan Batita
+
 package com.kauangamestore.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
