@@ -1,3 +1,5 @@
+//Classe de Kauan Batista
+
 package com.kauangamestore;
 
 import com.kauangamestore.service.HashService;
