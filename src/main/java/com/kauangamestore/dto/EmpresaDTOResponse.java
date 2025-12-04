@@ -1,3 +1,5 @@
+//Classe de Kauan Batista
+
 package com.kauangamestore.dto;
 
 public class EmpresaDTOResponse {
