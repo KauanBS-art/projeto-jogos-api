@@ -5,6 +5,7 @@ package com.kauangamestore.resource;
 import com.kauangamestore.dto.EmpresaDTO;
 import com.kauangamestore.dto.EmpresaDTOResponse;
 import com.kauangamestore.service.EmpresaService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -38,6 +39,7 @@ public class EmpresaResource {
 
     @POST
     @Transactional
+    @RolesAllowed("ADMINISTRADOR")
     public Response criar(@Valid EmpresaDTO dto, @Context UriInfo uriInfo) {
         EmpresaDTOResponse created = empresaService.create(dto);
         if (created == null) {
@@ -52,6 +54,7 @@ public class EmpresaResource {
     @PUT
     @Path("/{id}")
     @Transactional
+    @RolesAllowed("ADMINISTRADOR")
     public Response atualizar(@PathParam("id") Long id, @Valid EmpresaDTO dto) {
         EmpresaDTOResponse updated = empresaService.update(id, dto);
         return updated == null
@@ -62,6 +65,7 @@ public class EmpresaResource {
     @DELETE
     @Path("/{id}")
     @Transactional
+    @RolesAllowed("ADMINISTRADOR")
     public Response delete(@PathParam("id") Long id) {
         empresaService.delete(id);
         return Response.status(Response.Status.NO_CONTENT).build();
