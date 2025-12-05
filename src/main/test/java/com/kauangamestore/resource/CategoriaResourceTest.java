@@ -1,51 +1,77 @@
+//Classe de Kauan Batista
+
 package com.kauangamestore.resource;
 
+import com.kauangamestore.dto.CategoriaDTO;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 
 @QuarkusTest
 public class CategoriaResourceTest {
 
     @Test
-    void deveListarCategorias() {
+    public void testFindAll() {
         given()
             .when().get("/categorias")
             .then()
-            .statusCode(200)
-            .body("size()", greaterThanOrEqualTo(0));
+            .statusCode(200);
     }
 
     @Test
-    void deveCriarAtualizarExcluirCategoria() {
-        // Cria nova categoria
-        String location = given()
-            .contentType(ContentType.JSON)
-            .body("{\"nome\":\"Aventura\"}")
-        .when()
-            .post("/categorias")
-        .then()
-            .statusCode(201)
-            .extract().header("Location");
+    @TestSecurity(user = "admin", roles = {"ADMINISTRADOR"})
+    public void testCreate() {
+        CategoriaDTO dto = new CategoriaDTO("RPG");
 
-        String id = location.substring(location.lastIndexOf('/') + 1);
-
-        // Atualiza categoria
         given()
             .contentType(ContentType.JSON)
-            .body("{\"nome\":\"Ação/Aventura\"}")
-        .when()
-            .put("/categorias/" + id)
-        .then()
-            .statusCode(anyOf(is(200), is(204)));
+            .body(dto)
+            .when().post("/categorias")
+            .then()
+            .statusCode(201)
+            .body("id", notNullValue())
+            .body("nome", is("RPG"));
+    }
 
-        // Exclui categoria
+    @Test
+    @TestSecurity(user = "admin", roles = {"ADMINISTRADOR"})
+    public void testUpdate() {
+        CategoriaDTO dto = new CategoriaDTO("Aventura");
+        Integer id = given()
+            .contentType(ContentType.JSON)
+            .body(dto)
+            .when().post("/categorias")
+            .then().statusCode(201).extract().path("id");
+
+        CategoriaDTO updateDto = new CategoriaDTO("Ação e Aventura");
+
+        given()
+            .contentType(ContentType.JSON)
+            .body(updateDto)
+            .when().put("/categorias/" + id)
+            .then()
+            .statusCode(200)
+            .body("nome", is("Ação e Aventura"));
+    }
+
+    @Test
+    @TestSecurity(user = "admin", roles = {"ADMINISTRADOR"})
+    public void testDelete() {
+        CategoriaDTO dto = new CategoriaDTO("Terror");
+        Integer id = given()
+            .contentType(ContentType.JSON)
+            .body(dto)
+            .when().post("/categorias")
+            .then().statusCode(201).extract().path("id");
+
         given()
             .when().delete("/categorias/" + id)
-        .then()
+            .then()
             .statusCode(204);
     }
 }
