@@ -1,0 +1,11 @@
+//Classe de Kauan Batista Silveira
+
+package com.kauangamestore.repository;
+
+import com.kauangamestore.model.Pedido;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class PedidoRepository implements PanacheRepository<Pedido> {
+}
