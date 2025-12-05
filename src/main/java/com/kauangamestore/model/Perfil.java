@@ -1,4 +1,4 @@
-//Classe de Kauan Batista
+//Enum de Kauan Batista
 
 package com.kauangamestore.model;
 
