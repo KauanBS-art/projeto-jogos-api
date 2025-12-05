@@ -1,51 +1,80 @@
+//Classe de Kauan Batista
+
 package com.kauangamestore.resource;
 
+import com.kauangamestore.dto.PlataformaDTO;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 
 @QuarkusTest
 public class PlataformaResourceTest {
 
     @Test
-    void deveListarPlataformas() {
+    public void testFindAll() {
         given()
             .when().get("/plataformas")
             .then()
-            .statusCode(200)
-            .body("size()", greaterThanOrEqualTo(0));
+            .statusCode(200);
     }
 
     @Test
-    void deveCriarAtualizarExcluirPlataforma() {
-        // Cria nova plataforma
-        String location = given()
-            .contentType(ContentType.JSON)
-            .body("{\"nome\":\"PlayStation 5\"}")
-        .when()
-            .post("/plataformas")
-        .then()
-            .statusCode(201)
-            .extract().header("Location");
+    public void testFindById() {
+        given()
+            .when().get("/plataformas/1")
+            .then()
+            .statusCode(200)
+            .body("nome", is("PC"));
+    }
 
-        String id = location.substring(location.lastIndexOf('/') + 1);
+    @Test
+    @TestSecurity(user = "admin", roles = {"ADMINISTRADOR"})
+    public void testCreate() {
+        PlataformaDTO dto = new PlataformaDTO("Mega Drive");
 
-        // Atualiza plataforma
         given()
             .contentType(ContentType.JSON)
-            .body("{\"nome\":\"PS5\"}")
-        .when()
-            .put("/plataformas/" + id)
-        .then()
-            .statusCode(anyOf(is(200), is(204)));
+            .body(dto)
+            .when().post("/plataformas")
+            .then()
+            .statusCode(201)
+            .body("id", notNullValue())
+            .body("nome", is("Mega Drive"));
+    }
 
-        // Exclui plataforma
+    @Test
+    @TestSecurity(user = "admin", roles = {"ADMINISTRADOR"})
+    public void testUpdate() {
+        PlataformaDTO dto = new PlataformaDTO("PC Gamer");
+
+        given()
+            .contentType(ContentType.JSON)
+            .body(dto)
+            .when().put("/plataformas/1")
+            .then()
+            .statusCode(200)
+            .body("nome", is("PC Gamer"));
+    }
+
+    @Test
+    @TestSecurity(user = "admin", roles = {"ADMINISTRADOR"})
+    public void testDelete() {
+
+        PlataformaDTO dto = new PlataformaDTO("Para Deletar");
+        Integer id = given()
+            .contentType(ContentType.JSON)
+            .body(dto)
+            .when().post("/plataformas")
+            .then().statusCode(201).extract().path("id");
+
         given()
             .when().delete("/plataformas/" + id)
-        .then()
+            .then()
             .statusCode(204);
     }
 }
