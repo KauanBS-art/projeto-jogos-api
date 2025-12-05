@@ -27,7 +27,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Transactional
     public CategoriaDTOResponse create(CategoriaDTO dto) {
         Categoria categoria = new Categoria();
-        categoria.setNome(dto.nome()); // ✅ corrigido
+        categoria.setNome(dto.nome());
         repository.persist(categoria);
         return toResponse(categoria);
     }
@@ -50,7 +50,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     public CategoriaDTOResponse update(Long id, CategoriaDTO dto) {
         Categoria categoria = repository.findById(id);
         if (categoria == null) return null;
-        categoria.setNome(dto.nome()); // ✅ corrigido
+        categoria.setNome(dto.nome());
         repository.persist(categoria);
         return toResponse(categoria);
     }
