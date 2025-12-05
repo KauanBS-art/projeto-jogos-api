@@ -5,6 +5,7 @@ package com.kauangamestore.resource;
 import com.kauangamestore.dto.PlataformaDTO;
 import com.kauangamestore.dto.PlataformaDTOResponse;
 import com.kauangamestore.service.PlataformaService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -34,6 +35,7 @@ public class PlataformaResource {
     }
 
     @POST
+    @RolesAllowed("ADMINISTRADOR")
     public Response criar(@Valid PlataformaDTO dto, @Context UriInfo uriInfo) {
         PlataformaDTOResponse created = plataformaService.create(dto);
         UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.getId()));
@@ -42,6 +44,7 @@ public class PlataformaResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMINISTRADOR")
     public Response atualizar(@PathParam("id") Long id, @Valid PlataformaDTO dto) {
         PlataformaDTOResponse updated = plataformaService.update(id, dto);
         return updated == null
@@ -49,9 +52,9 @@ public class PlataformaResource {
             : Response.ok(updated).build();
     }
 
-
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMINISTRADOR")
     public Response deletar(@PathParam("id") Long id) {
         plataformaService.delete(id);
         return Response.noContent().build();
