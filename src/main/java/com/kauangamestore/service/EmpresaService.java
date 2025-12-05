@@ -1,3 +1,5 @@
+//Classe de Kauan Batista
+
 package com.kauangamestore.service;
 
 import com.kauangamestore.dto.EmpresaDTO;
