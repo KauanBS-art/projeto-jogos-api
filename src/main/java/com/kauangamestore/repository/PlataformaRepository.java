@@ -6,8 +6,5 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class PlataformaRepository implements PanacheRepository<Plataforma> {
-
-    public Plataforma findByNome(String nome) {
-        return find("nome", nome).firstResult();
-    }
+    
 }
