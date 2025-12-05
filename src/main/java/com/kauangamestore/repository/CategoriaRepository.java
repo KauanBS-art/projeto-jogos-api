@@ -1,3 +1,5 @@
+//Classe de Kauan Batista Silveira
+
 package com.kauangamestore.repository;
 
 import com.kauangamestore.model.Categoria;
