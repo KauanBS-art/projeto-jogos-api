@@ -19,13 +19,11 @@ public class UsuarioResource {
     @Inject
     UsuarioService usuarioService;
 
-    // LISTAR TODOS
     @GET
     public List<UsuarioDTOResponse> listarTodos() {
         return usuarioService.findAll();
     }
 
-    // BUSCAR POR ID
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
@@ -35,7 +33,6 @@ public class UsuarioResource {
         return Response.ok(usuario).build();
     }
 
-    // CRIAR NOVO
     @POST
     public Response criar(@Valid UsuarioDTO dto, @Context UriInfo uriInfo) {
         UsuarioDTOResponse created = usuarioService.create(dto);
@@ -43,7 +40,6 @@ public class UsuarioResource {
         return Response.created(builder.build()).entity(created).build();
     }
 
-    // ATUALIZAR EXISTENTE
     @PUT
     @Path("/{id}")
     public Response atualizar(@PathParam("id") Long id, @Valid UsuarioDTO dto) {
@@ -53,7 +49,6 @@ public class UsuarioResource {
             : Response.ok(usuario).build();
     }
 
-    // DELETAR
     @DELETE
     @Path("/{id}")
     public Response deletar(@PathParam("id") Long id) {
